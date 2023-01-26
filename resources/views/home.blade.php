@@ -21,7 +21,8 @@
         <ul>
             <li><a href="{{route("comics.create")}}">Create</a></li>
             <li><a href="{{route("comics.index")}}">Index</a></li>
-            {{-- <li><a href="{{route("comics.show"), $comics->$id}}">Show</a></li> --}}
+            <li><a href="{{route("comics.show")}}">Show</a></li>
+            <li><a href="{{route("comics.store")}}">Store</a></li>
         </ul>
     </main>
 

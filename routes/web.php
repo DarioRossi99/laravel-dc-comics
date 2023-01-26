@@ -18,5 +18,5 @@ use App\Http\Controllers\ComicController;
 Route::get("/", [HomeController::class, "home"])->name("home");
 Route::get("/comics", [ComicController::class, "index"])->name("comics.index");
 Route::get("/comics/create", [ComicController::class, "create"])->name("comics.create");
-Route::post("/comics", [ComicController::class, "store"])->name("comics.store");
-Route::get("/comics/{comics}", [ComicController::class, "show"])->name("comics.show");
+Route::get("/comics/store", [ComicController::class, "store"])->name("comics.store");
+Route::get("/comics/show", [ComicController::class, "show"])->name("comics.show");
