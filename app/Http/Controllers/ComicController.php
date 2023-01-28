@@ -14,7 +14,8 @@ class ComicController extends Controller
      */
     public function index()
     {
-        return view("comics.index");
+        $comics = Comic::all();
+        return view("comics.index", compact("comics"));
     }
 
     /**
@@ -35,7 +36,15 @@ class ComicController extends Controller
      */
     public function store(Request $request)
     {
-        return redirect()->route("comics.show", $comics->id);
+        $element = $request->all();
+        $element["price"] = (float) $element["price"];
+        $element["available"] = !key_exists("available", $element) ? false : true;
+
+        $comic = new Comic();
+        $comic->fill($element);
+        $comic->save();
+
+        return redirect()->route("comics.index", $comic->id);
     }
 
     /**
@@ -46,7 +55,8 @@ class ComicController extends Controller
      */
     public function show($id)
     {
-        $product = Comic::findOrFail($id);
+        $comic = Comic::findOrFail($id);
+        return view("comics.show", compact("comic"));
     }
 
     /**
@@ -57,7 +67,9 @@ class ComicController extends Controller
      */
     public function edit($id)
     {
-        //
+        $comic = Comic::find($id);
+
+        return view("comics.edit", compact("comic"));
     }
 
     /**
@@ -69,7 +81,15 @@ class ComicController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $element = $request->all();
+        if (!key_exists("available", $element)) {
+            $element["available"] =  false;
+        } else {
+            $element["available"] = true;
+        }
+        $comic = Comic::findOrFail($id);
+        $comic->update($element);
+        return redirect()->route("comics.index", $comic->id);
     }
 
     /**
@@ -80,6 +100,8 @@ class ComicController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $comic = Comic::findOrFail($id);
+        $comic->delete();
+        return redirect()->route("comics.index");
     }
 }
