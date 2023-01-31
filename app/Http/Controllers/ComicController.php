@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Http\Requests\StoreComicRequest;
+use App\Http\Requests\UpdateComicRequest;
+use App\Models\Comics;
 use Illuminate\Http\Request;
-use App\Models\Comic;
+use Illuminate\Support\Facades\Validator;
 
-class ComicController extends Controller
+class ComicsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +16,8 @@ class ComicController extends Controller
      */
     public function index()
     {
-        $comics = Comic::all();
-        return view("comics.index", compact("comics"));
+        $comics = Comics::all();
+        return view('comics.index', compact('comics'));
     }
 
     /**
@@ -25,7 +27,7 @@ class ComicController extends Controller
      */
     public function create()
     {
-        return view("comics.create");
+        return view('comics.create');
     }
 
     /**
@@ -34,73 +36,62 @@ class ComicController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreComicRequest $request)
     {
-        $element = $request->all();
-        $element["price"] = (float) $element["price"];
-        $element["available"] = !key_exists("available", $element) ? false : true;
-
-        $comic = new Comic();
-        $comic->fill($element);
-        $comic->save();
-
-        return redirect()->route("comics.index", $comic->id);
+        $data = $request->validated();
+        $data["available"] = !key_exists("available", $data) ? false : true;
+        $comics = Comics::create($data);
+        return redirect()->route("comics.index", $comics->id);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Comics  $comics
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $comic = Comic::findOrFail($id);
-        return view("comics.show", compact("comic"));
+        $comic = Comics::findOrFail($id);
+        return view("comics.show", compact('comic'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Comics  $comics
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Comics $comic)
     {
-        $comic = Comic::find($id);
-
-        return view("comics.edit", compact("comic"));
+        return view('comics.edit', compact('comic'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Comics  $comics
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreComicRequest $request, Comics $comic)
     {
-        $element = $request->all();
-        if (!key_exists("available", $element)) {
-            $element["available"] =  false;
-        } else {
-            $element["available"] = true;
-        }
-        $comic = Comic::findOrFail($id);
-        $comic->update($element);
-        return redirect()->route("comics.index", $comic->id);
+        $data = $request->validated();
+        $data["available"] = key_exists("available", $data) ? true : false;
+
+        $comic->update($data);
+
+        return redirect()->route("comics.show", $comic->id);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Comics  $comics
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Comics $comic)
     {
-        $comic = Comic::findOrFail($id);
         $comic->delete();
         return redirect()->route("comics.index");
     }
